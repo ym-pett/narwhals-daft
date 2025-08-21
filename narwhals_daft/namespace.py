@@ -21,12 +21,20 @@ if TYPE_CHECKING:
     from narwhals.dtypes import DType
     from narwhals.typing import ConcatMethod
 
-
+### Dan's suggestion ###
 class DaftNamespace(LazyNamespace[DaftLazyFrame, DaftExpr, daft.DataFrame]):
     _implementation: Implementation = Implementation.UNKNOWN
 
+    def from_native(self, data: daft.DataFrame | Any, **kwargs: Any) -> DaftLazyFrame:
+        if kwargs:
+            msg = "eager_only and series_only options are not supported as daft is lazy-only."
+            raise ValueError(msg)
+        return super().from_native(data)
+
     def __init__(self, *, version: Version) -> None:
         self._version = version
+
+### Dan's suggestion ###
 
     @property
     def _expr(self) -> type[DaftExpr]:
